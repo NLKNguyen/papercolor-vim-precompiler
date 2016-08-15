@@ -1,0 +1,28 @@
+{
+  "name": "papercolor-vim-precompiler",
+  "version": "0.1.0",
+  "description": "Precompile papercolor-theme.vim framework to blazingly fast, stand-alone vim color schemes",
+  "main": "compile.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NLKNguyen/papercolor-vim-precompiler.git"
+  },
+  "keywords": [
+    "vim",
+    "precompiler",
+    "papercolor",
+    "theme"
+  ],
+  "author": "Nikyle Nguyen <NLKNguyen@MSN.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NLKNguyen/papercolor-vim-precompiler/issues"
+  },
+  "homepage": "https://github.com/NLKNguyen/papercolor-vim-precompiler#readme"
+}

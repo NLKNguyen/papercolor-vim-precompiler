@@ -8,21 +8,12 @@ ARG REQUIRED_PACKAGES="sudo nodejs git wget rsync zip"
 RUN apk update && apk upgrade \
       && apk add --no-cache ${REQUIRED_PACKAGES}
 
-#### CREATE DEFAULT USER ####
+#### DEFAULT USER ####
 ARG USER=alpine
 ENV USER ${USER}
 RUN adduser -D ${USER} \
       && echo "${USER}   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers 
 
-#### CREATE WORKING DIRECTORY FOR USER ####
-ARG WORKDIR=/project
-ENV WORKDIR ${WORKDIR}
-RUN mkdir ${WORKDIR}
-RUN chown -R ${USER} ${WORKDIR}
-
-#### SET DEFAULT WORKING DIRECTORY AND USER  ####
-WORKDIR ${WORKDIR}
-USER ${USER}
 
 ### CONFIG NPM when installing packages ###
 # --no-bin-links by default
@@ -32,3 +23,14 @@ RUN npm config set bin-links false
 
 # Also --no-optional by default
 RUN npm config set optional false
+
+#### APP DIRECTORY ####
+RUN mkdir -p /usr/src/app
+
+USER ${USER}
+
+#### BUILD ####
+ONBUILD WORKDIR /usr/src/app
+ONBUILD COPY package.json .
+ONBUILD RUN npm install
+ONBUILD COPY . /usr/src/app

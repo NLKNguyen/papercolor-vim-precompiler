@@ -1,6 +1,5 @@
-FROM nlknguyen/papercolor-vim-precompiler:base
+FROM nlknguyen/papercolor-vim-precompiler:onbuild
 
-# COPY package.json .
-# RUN npm install
+WORKDIR /mnt
 
-CMD ["/bin/ash"]
+CMD ["node", "/usr/src/app/compile.js"]
