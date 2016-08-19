@@ -7,7 +7,7 @@ task_compile=0
 while [ "$1" != "" ]; 
 do
 	PARAM=$(echo "$1" | awk -F= '{print $1}')
-	VALUE=$(echo "$1" | awk -F= '{print $2}')
+	# VALUE=$(echo "$1" | awk -F= '{print $2}')
 
 	case $PARAM in
 		# -h | --help)
@@ -56,11 +56,11 @@ if [ $task_compile -eq 1 ]; then
 	cd "$(mktemp -d)" || exit 1
 
 	# Generate intermediate file
-	vim -Nu ${custom_rtp}/.vimrc -c 'call PaperColor#GenerateSpecs()' +qall
+	vim -Nu "${custom_rtp}/.vimrc" -c 'call PaperColor#GenerateSpecs()' +qall
 
 	highlighting_file="highlightings.yml"
 
-	[ ! -f "$highlighting_file"] && echo "Can't detect intermediate file: $highlighting_file" && exit 1
+	[ ! -f "$highlighting_file" ] && echo "Can't detect intermediate file: $highlighting_file" && exit 1
 
 	# invoke compiler
 	node ${app_path}/compile.js ${highlighting_file}
