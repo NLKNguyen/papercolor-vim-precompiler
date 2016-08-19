@@ -7,13 +7,14 @@ services:
 
 before_install:
   - shopt -s expand_aliases
+  - shopt -s globstar  
 
 install:
   - docker pull nlknguyen/alpine-shellcheck
   - alias shellcheck='docker run --rm -it -v $(pwd):/mnt nlknguyen/alpine-shellcheck'
 
 script:
-  - shellcheck app/run.sh
+  - shellcheck **/*.sh
   - docker build -t nlknguyen/papercolor-vim-precompiler:base base/
   - docker build -t nlknguyen/papercolor-vim-precompiler:app app/
 
