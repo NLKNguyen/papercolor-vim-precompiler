@@ -6,15 +6,16 @@ services:
   - docker
 
 before_install:
-  - shopt -s expand_aliases
-  - shopt -s globstar  
+  - shopt -s expand_aliases # to set alias in non-interactive terminal
+  - shopt -s globstar  # to use search patents like **/* on modern bash
 
 install:
   - docker pull nlknguyen/alpine-shellcheck
   - alias shellcheck='docker run --rm -it -v $(pwd):/mnt nlknguyen/alpine-shellcheck'
 
 script:
-  - "shellcheck **/*.{sh,bash}"
+  - |-
+    shellcheck **/*.{sh,bash}
   - docker build -t nlknguyen/papercolor-vim-precompiler:base base/
   - docker build -t nlknguyen/papercolor-vim-precompiler:app app/
 
