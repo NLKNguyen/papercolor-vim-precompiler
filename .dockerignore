@@ -1,5 +1,0 @@
-onbuild/
-Dockerfile
-
-node_modules/
-.gitignore
