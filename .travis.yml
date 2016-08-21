@@ -17,5 +17,5 @@ script:
   - shellcheck --version
   - shellcheck **/*.sh
   - docker build -t nlknguyen/papercolor-vim-precompiler:base base/
-  - docker build -t nlknguyen/papercolor-vim-precompiler:app app/
+  - docker build -t nlknguyen/papercolor-vim-precompiler:latest .
 

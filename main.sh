@@ -1,5 +1,4 @@
 #!/bin/sh
-
 app_path="/usr/src/app"
 
 task_compile=0
@@ -35,7 +34,7 @@ do
 done
 
 #######################
-# TASK: COPY NWJS
+# TASK: COMPILE
 if [ $task_compile -eq 1 ]; then
 	framework_file="PaperColor.vim"
 
@@ -48,22 +47,37 @@ if [ $task_compile -eq 1 ]; then
 
 	# Minimum vimrc file
 	cat > "${custom_rtp}/.vimrc" <<- EOF
+
 	set rtp+=${custom_rtp}
+	syntax on
 	color PaperColor
+
 	EOF
 
 	# Go to temporary build directory
 	cd "$(mktemp -d)" || exit 1
 
+	# Check if the input file causes vim startup error
+	vim -Nu "$custom_rtp/.vimrc" +qa >log.txt
+	if grep -q Error log.txt
+	then
+		echo "$framework_file caused starup error"
+		sed 's/^.*Error/Error/' log.txt
+		exit 1
+	fi
+	rm log.txt
+	
 	# Generate intermediate file
-	vim -Nu "${custom_rtp}/.vimrc" -c 'call PaperColor#GenerateSpecs()' +qall
+	vim -Nu "${custom_rtp}/.vimrc" -c 'call PaperColor#GenerateSpecs()' +qa >log.txt
+	# TODO: check Error like above
 
 	highlighting_file="highlightings.yml"
 
 	[ ! -f "$highlighting_file" ] && echo "Can't detect intermediate file: $highlighting_file" && exit 1
 
+	cp ${highlighting_file} /mnt/
 	# invoke compiler
-	node ${app_path}/compile.js ${highlighting_file}
+	node ${app_path} ${highlighting_file}
 
 	[ "$?" -ne 0 ] && echo "Program terminated with non-zero exit code." && exit 1
 

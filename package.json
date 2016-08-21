@@ -2,7 +2,7 @@
   "name": "papercolor-vim-precompiler",
   "version": "0.1.0",
   "description": "Precompile papercolor-theme.vim framework to blazingly fast, stand-alone vim color schemes",
-  "main": "compile.js",
+  "main": "index.js",
   "directories": {
     "test": "test"
   },
