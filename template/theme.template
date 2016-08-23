@@ -1,8 +1,4 @@
-" Theme: <%= theme_name %>
-" Precompiled by PaperColor-Theme-Precompiler on [TODO: datetime]
-" Description: <%= description %>
-" Website: <%= website %>
-" Maintainer: <%= maintainer %> 
+
 
 " Note: since this file is precompiled, the code is not intended to be interpreted or modified by human.
 
@@ -15,11 +11,13 @@ if has("gui_running") || (&t_Co == 256)
   <%    
     if (high_color.light_highlightings && high_color.dark_highlightings) {
       // has both dark and light variants
-      if (&background == 'light')
-        print(high_color.light_highlightings)
-      else
-        print(high_color.dark_highlightings)
-      endif    
+      print(`
+        if (&background == 'light')
+          ${high_color.light_highlightings}
+        else
+          ${high_color.dark_highlightings}
+        endif
+      `)  
     } else {
       // has single variant
       if (high_color.light_highlightings) {

@@ -81,6 +81,8 @@ if [ $task_compile -eq 1 ]; then
 
 	[ "$?" -ne 0 ] && echo "Program terminated with non-zero exit code." && exit 1
 
+	cp *.vim /mnt
+
 fi
 
 

@@ -9,36 +9,28 @@
  * @see: https://github.com/NLKNguyen/papercolor-vim-precompiler
  */
 
+const path = require('path')
 const YAML = require('yamljs')
 const _ = require('lodash')
 const fs = require('fs')
-
-/**
- * Convert json object of highlighting rules to VimL highlighting commands
- * 
- * @param {JSON} highlighting_groups the object contains highlighting rules for syntax groups
- */
-function convert_object_to_vim_commands (highlighting_groups) {
-  const result = ['']
-  _.forOwn(highlighting_groups, (group, highlighting) => {
-    result.push(`hi {group} {highlighting}`)
-  })
-  return result.join('\n')
-}
 
 
 function compile_all_themes () {
   const themes = YAML.load('highlightings.yml')
 
   _.forOwn(themes, (theme, name) => {
-    compile_theme(theme, name)
+    const model = build_model(theme, name)
+    const view = path.join(__dirname, 'template', 'theme.template')
+    const output = render(model, view)
+    save(output, `./papercolor-${name}.vim`)
   });
 }
 
-function compile_theme (theme, name) {
+
+function build_model (theme, name) {
   const high_color = theme['high-color']
   const low_color = theme['low-color']
-  const theme_name = `papercolor-{name}`
+  const theme_name = `papercolor-${name}`
   const model = {
     theme_name,
     'high_color' : {},
@@ -58,14 +50,33 @@ function compile_theme (theme, name) {
   else
     model.low_color.highlightings = convert_object_to_vim_commands(low_color['dark'])
   
-  save_model_to_file ('template/theme.template', model, `./{theme_name}.vim`)
+  return model
 }
 
-function save_model_to_file (templateSrc, model, outputDest) {
-  const src = fs.readFileSync(templateSrc, 'utf8')
+/**
+ * Convert json object of highlighting rules to VimL highlighting commands
+ * 
+ * @param {JSON} highlighting_groups the object contains highlighting rules for syntax groups
+ */
+function convert_object_to_vim_commands (highlighting_groups) {
+  const result = ['']
+  _.forOwn(highlighting_groups, (highlighting, group) => {
+    result.push(`hi ${group} ${highlighting}`)
+  })
+  return result.join('\n')
+}
+
+
+
+function render (model, view) {
+  const src = fs.readFileSync(view, 'utf8')
   const compiled = _.template(src)
   const output = compiled(model)
+  return output
+}
 
+
+function save (output, outputDest) {
   const file = fs.createWriteStream(outputDest, { flags: 'w'} ) // create new or overwrite existing file
   file.on('error', (err) => { console.log(`Error generating ${outputDest}`) })
   file.write(output, () => { console.log(`Generated ${outputDest}`) })
