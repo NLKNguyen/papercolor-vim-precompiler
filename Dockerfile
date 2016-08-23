@@ -21,7 +21,7 @@ COPY . .
 # Start working at the mounted directory
 WORKDIR /mnt
 
-ENTRYPOINT ["/usr/src/app/run.sh"]
+ENTRYPOINT ["/usr/src/app/main.sh"]
 CMD ["--compile"]
 
 # CMD ["/usr/src/app/main.sh", "--compile"]
