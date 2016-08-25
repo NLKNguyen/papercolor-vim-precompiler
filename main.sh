@@ -57,7 +57,7 @@ if [ $task_compile -eq 1 ]; then
 	# Go to temporary build directory
 	cd "$(mktemp -d)" || exit 1
 
-	echo -n "Check startup status... "
+	printf "Check startup status... "
 	vim -Nu "$custom_rtp/.vimrc" +qa 1>log.txt 2>/dev/null
 	if grep -q Error log.txt
 	then
@@ -69,7 +69,7 @@ if [ $task_compile -eq 1 ]; then
 	echo "ok"
 	
 	# Generate intermediate file
-	echo -n "Generate intermediate file... "
+	printf "Generate intermediate file... "
 	vim -Nu "${custom_rtp}/.vimrc" -c 'call PaperColor#GenerateSpecs()' +qa 1>log.txt 2>/dev/null
 	
 	# TODO: check Error like above
@@ -88,7 +88,7 @@ if [ $task_compile -eq 1 ]; then
 	[ "$?" -ne 0 ] && echo "Program terminated with non-zero exit code." && exit 1
 
 
-	echo -n  "Copy output files over... "
+	printf "Copy output files over... "
 	cp ./*.vim /mnt
 	echo "done"
 fi
