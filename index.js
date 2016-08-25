@@ -19,7 +19,6 @@ function compile_all_themes () {
   const themes = YAML.load('highlightings.yml')
 
   _.forOwn(themes, (theme, name) => {
-    console.log(name)
     const theme_name = `papercolor-${name}`
     const model = build_model(theme, theme_name)
     const view = path.join(__dirname, 'template', 'theme.template')
@@ -71,7 +70,7 @@ function convert_object_to_vim_commands (highlighting_groups) {
                                 .mapValues(arr => _.map(arr, f_key))
                                 .value()
   
-  console.log(grouped_highlighting_groups)
+  // console.log(grouped_highlighting_groups)
   let groupId = 0
   let groupName = '_'
   _.forEach(grouped_highlighting_groups, (groups, highlighting) => {
@@ -121,7 +120,7 @@ function render (model, view) {
 function save (output, outputDest) {
   const file = fs.createWriteStream(outputDest, { flags: 'w'} ) // create new or overwrite existing file
   file.on('error', (err) => { console.log(`Error generating ${outputDest}`) })
-  file.write(output, () => { console.log(`Generated ${outputDest}`) })
+  file.write(output, () => { console.log(`=> ${outputDest}`) })
   file.end()
 };
 

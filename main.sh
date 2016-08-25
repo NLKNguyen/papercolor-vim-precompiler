@@ -57,32 +57,40 @@ if [ $task_compile -eq 1 ]; then
 	# Go to temporary build directory
 	cd "$(mktemp -d)" || exit 1
 
-	# Check if the input file causes vim startup error
-	vim -Nu "$custom_rtp/.vimrc" +qa >log.txt
+	echo -n "Check startup status... "
+	vim -Nu "$custom_rtp/.vimrc" +qa 1>log.txt 2>/dev/null
 	if grep -q Error log.txt
 	then
 		echo "$framework_file caused starup error"
 		sed 's/^.*Error/Error/' log.txt
 		exit 1
-	fi
+	fi	
 	rm log.txt
+	echo "ok"
 	
 	# Generate intermediate file
-	vim -Nu "${custom_rtp}/.vimrc" -c 'call PaperColor#GenerateSpecs()' +qa >log.txt
+	echo -n "Generate intermediate file... "
+	vim -Nu "${custom_rtp}/.vimrc" -c 'call PaperColor#GenerateSpecs()' +qa 1>log.txt 2>/dev/null
+	
 	# TODO: check Error like above
 
 	highlighting_file="highlightings.yml"
 
 	[ ! -f "$highlighting_file" ] && echo "Can't detect intermediate file: $highlighting_file" && exit 1
+	echo "ok"
 
-	cp ${highlighting_file} /mnt/
+	# cp ${highlighting_file} /mnt/
+
 	# invoke compiler
+	echo "Compile... "
 	node ${app_path} ${highlighting_file}
 
 	[ "$?" -ne 0 ] && echo "Program terminated with non-zero exit code." && exit 1
 
-	cp ./*.vim /mnt
 
+	echo -n  "Copy output files over... "
+	cp ./*.vim /mnt
+	echo "done"
 fi
 
 
