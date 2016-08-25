@@ -19,10 +19,12 @@ function compile_all_themes () {
   const themes = YAML.load('highlightings.yml')
 
   _.forOwn(themes, (theme, name) => {
-    const model = build_model(theme, name)
+    console.log(name)
+    const theme_name = `papercolor-${name}`
+    const model = build_model(theme, theme_name)
     const view = path.join(__dirname, 'template', 'theme.template')
     const output = render(model, view)
-    save(output, `./papercolor-${name}.vim`)
+    save(output, `./${theme_name}.vim`)
   });
 }
 
@@ -30,9 +32,8 @@ function compile_all_themes () {
 function build_model (theme, name) {
   const high_color = theme['high-color']
   const low_color = theme['low-color']
-  const theme_name = `papercolor-${name}`
   const model = {
-    theme_name,
+    'theme_name': name,
     'high_color' : {},
     'low_color' : {}
   }
@@ -60,9 +61,50 @@ function build_model (theme, name) {
  */
 function convert_object_to_vim_commands (highlighting_groups) {
   const result = ['']
-  _.forOwn(highlighting_groups, (highlighting, group) => {
-    result.push(`hi ${group} ${highlighting}`)
+  // console.log(highlighting_groups)
+  const f_key = (e) => e[0]
+  const f_value = (e) => e[1]
+  
+  const grouped_highlighting_groups = _(highlighting_groups)
+                                .toPairs()
+                                .groupBy(f_value)
+                                .mapValues(arr => _.map(arr, f_key))
+                                .value()
+  
+  console.log(grouped_highlighting_groups)
+  let groupId = 0
+  let groupName = '_'
+  _.forEach(grouped_highlighting_groups, (groups, highlighting) => {
+    if (groups.length == 1) {
+      const group = groups[0]
+      result.push(`hi ${group} ${highlighting}`)
+    } else {
+      // set groupName as a single alphabet to reduce characters
+      // groupId number from 0 to 51 will have equivalent alphabet A to z
+      // beyond that, the number is retained and prefixed by an underscore
+      if (groupId <= 25) {
+        groupName = `${String.fromCharCode(65 + groupId)}`
+      } else if (groupId > 25 && groupId <= 51) {
+        groupName = `${String.fromCharCode(97 + (groupId - 26))}`
+      } else {
+        groupName = `_${(groupId).toString(16)}`
+      }
+
+      const hidef = `hi def ${groupName} ${highlighting}`
+      result.push(hidef)
+      _.forEach(groups, (group, idx) => { 
+        const hilink = `hi link ${group} ${groupName}`
+        const hidecl = `hi ${group} ${highlighting}`       
+        result.push( (hilink.length < hidecl.length) ? hilink : hidecl)   
+      })
+
+      groupId++
+    }
   })
+  // Plain highlight commands: no linking to reduce characters
+  // _.forOwn(highlighting_groups, (highlighting, group) => {
+  //   result.push(`hi ${group} ${highlighting}`)
+  // })
   return result.join('\n')
 }
 

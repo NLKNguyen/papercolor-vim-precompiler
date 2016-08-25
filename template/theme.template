@@ -7,7 +7,6 @@ syntax reset
 let g:colors_name = "<%= theme_name %>"
 
 if has("gui_running") || (&t_Co == 256) 
-
   <%    
     if (high_color.light_highlightings && high_color.dark_highlightings) {
       // has both dark and light variants
@@ -27,8 +26,6 @@ if has("gui_running") || (&t_Co == 256)
       }
     }
   %>
-
 else
   <%= low_color.highlightings %>
 endif
-

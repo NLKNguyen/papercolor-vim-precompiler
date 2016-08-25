@@ -6,6 +6,7 @@
 # or in case the temporary alias is desirable:
 #   $ source misc/build.sh
 
+options=$1
 
-docker build -t nlknguyen/papercolor-vim-precompiler:latest .
+docker build ${options} -t nlknguyen/papercolor-vim-precompiler:latest .
 alias app='docker run --rm -it -v $(pwd):/mnt nlknguyen/papercolor-vim-precompiler:latest'
