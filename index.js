@@ -19,7 +19,8 @@ function compile_all_themes () {
   const themes = YAML.load('highlightings.yml')
 
   _.forOwn(themes, (theme, name) => {
-    const theme_name = `papercolor-${name}`
+    const prefix = 'papercolor-'
+    const theme_name = `${prefix}${name}`
     const model = build_model(theme, theme_name)
     const view = path.join(__dirname, 'template', 'theme.template')
     const output = render(model, view)
@@ -60,50 +61,66 @@ function build_model (theme, name) {
  */
 function convert_object_to_vim_commands (highlighting_groups) {
   const result = ['']
-  // console.log(highlighting_groups)
-  const f_key = (e) => e[0]
-  const f_value = (e) => e[1]
-  
-  const grouped_highlighting_groups = _(highlighting_groups)
-                                .toPairs()
-                                .groupBy(f_value)
-                                .mapValues(arr => _.map(arr, f_key))
-                                .value()
-  
-  // console.log(grouped_highlighting_groups)
-  let groupId = 0
-  let groupName = '_'
-  _.forEach(grouped_highlighting_groups, (groups, highlighting) => {
-    if (groups.length == 1) {
-      const group = groups[0]
-      result.push(`hi ${group} ${highlighting}`)
-    } else {
-      // set groupName as a single alphabet to reduce characters
-      // groupId number from 0 to 51 will have equivalent alphabet A to z
-      // beyond that, the number is retained and prefixed by an underscore
-      if (groupId <= 25) {
-        groupName = `${String.fromCharCode(65 + groupId)}`
-      } else if (groupId > 25 && groupId <= 51) {
-        groupName = `${String.fromCharCode(97 + (groupId - 26))}`
-      } else {
-        groupName = `_${(groupId).toString(16)}`
-      }
-
-      const hidef = `hi def ${groupName} ${highlighting}`
-      result.push(hidef)
-      _.forEach(groups, (group, idx) => { 
-        const hilink = `hi link ${group} ${groupName}`
-        const hidecl = `hi ${group} ${highlighting}`       
-        result.push( (hilink.length < hidecl.length) ? hilink : hidecl)   
-      })
-
-      groupId++
-    }
+  // Plain highlight commands: no linking
+  _.forOwn(highlighting_groups, (highlighting, group) => {
+    result.push(`hi ${group} ${highlighting}`)
   })
-  // Plain highlight commands: no linking to reduce characters
-  // _.forOwn(highlighting_groups, (highlighting, group) => {
-  //   result.push(`hi ${group} ${highlighting}`)
+  
+  // TODO: The following strategy helps reduce the compiled file about 40% by using highlight linking,
+  // but it produces some inconsistencies on the syntax highlighting when loaded in Vim
+  // 
+  // const keyOfPair = (e) => e[0]
+  // const valueOfPair = (e) => e[1]
+  
+  // const grouped_highlighting_groups = _(highlighting_groups) // from : { k1: v1, k2: v2, ... }
+  //                                     .toPairs()             // to   : [ [k1, v1], [k2, v2], ... ]
+  //                                     .groupBy(valueOfPair)  // then : { v1 : [ [k1, v1], [k5, v1], .. ], v2 : [ [k2, v2], [k4, v2], .. ], ... }
+  //                                     .mapValues(arr => _.map(arr, keyOfPair)) // finally : { v1 : [k1, k5, ..], v2 : [ k2, k4, ..], ... }
+  //                                     .value()
+  
+  // // console.log(grouped_highlighting_groups)
+  // let groupId = 0
+  // let groupName = '_'
+  // _.forEach(grouped_highlighting_groups, (groups, highlighting) => {
+
+  //     // const groupName = _.head(groups)
+  //     // const hidef = `hi ${groupName} ${highlighting}`
+  //     // result.push(hidef)
+  //     // _.forEach(_.tail(groups), (group, idx) => { 
+  //     //   const hilink = `hi! link ${group} ${groupName}`
+  //     //   result.push(hilink)
+  //     // })
+
+
+  //   if (groups.length == 1) {
+  //     const group = groups[0]
+  //     result.push(`hi ${group} ${highlighting}`)
+  //   } else {
+  //     // set groupName as a single alphabet to reduce characters
+  //     // groupId number from 0 to 51 will have equivalent alphabet A to z
+  //     // beyond that, use hex number with underscore prefix to avoid leading number
+  //     if (groupId <= 25) {
+  //       groupName = `_${String.fromCharCode(65 + groupId)}` // A-Z
+  //     } else if (groupId > 25 && groupId <= 51) {
+  //       groupName = `_${String.fromCharCode(97 + (groupId - 26))}` // a-z
+  //     } else {
+  //       groupName = `_${(groupId).toString(16)}`
+  //     }
+
+  //     const hidef = `hi ${groupName} ${highlighting}`
+  //     result.push(hidef)
+  //     _.forEach(groups, (group, idx) => { 
+  //       const hilink = `hi! link ${group} ${groupName}`
+  //       const hidecl = `hi ${group} ${highlighting}`       
+  //       result.push( (hilink.length < hidecl.length) ? hilink : hidecl)   
+  //     })
+
+  //     groupId++
+  //   }
+
   // })
+
+
   return result.join('\n')
 }
 

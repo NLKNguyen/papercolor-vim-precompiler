@@ -38,6 +38,8 @@ done
 if [ $task_compile -eq 1 ]; then
 	framework_file="PaperColor.vim"
 
+	cat ${framework_file}
+
 	# Custom temporary runtime path for vim
 	custom_rtp=$(mktemp -d)
 

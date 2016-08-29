@@ -1,6 +1,5 @@
 
-
-" Note: since this file is precompiled, the code is not intended to be interpreted or modified by human.
+" This source code is precompiled and is not intended to be interpreted or modified by human.
 
 hi clear
 syntax reset
@@ -28,4 +27,5 @@ if has("gui_running") || (&t_Co == 256)
   %>
 else
   <%= low_color.highlightings %>
+
 endif
